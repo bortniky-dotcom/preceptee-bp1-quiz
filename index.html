@@ -68,15 +68,29 @@ input[type=text] {
 }
 .score { font-size: 1.6rem; margin: .2rem 0 .8rem; }
 .item { border-top: 1px solid var(--line); padding: 1rem 0; }
-.item .verdict { font-family: system-ui, sans-serif; font-size: .85rem; margin: .35rem 0; }
-.item .ok { color: var(--ok); }
-.item .bad { color: var(--bad); }
-.item .rationale { font-size: .95rem; color: #2a261f; }
-footer { margin-top: 1.5rem; font-family: system-ui, sans-serif; font-size: .8rem; color: #5b5348; }
-#startCard, #quizCard, #resultCard, #answerCard { display: none; }
-#startCard.show, #quizCard.show, #resultCard.show, #answerCard.show { display: block; }
-textarea { width: 100%; min-height: 8rem; font-family: system-ui, sans-serif; font-size: .9rem; padding: .6rem; border: 1px solid var(--line); background: var(--paper); }
-.status { font-family: system-ui, sans-serif; font-size: .85rem; color: #5b5348; margin-top: .5rem; }
+.item .verdict { font-family: system-ui, sans-serif; font-size: .82rem; margin: 0 0 .35rem; }
+.item.ok .verdict { color: var(--ok); }
+.item.bad .verdict { color: var(--bad); }
+footer {
+  font-family: system-ui, sans-serif;
+  font-size: .78rem;
+  color: #5b5348;
+  text-align: center;
+  padding: 1.5rem 1rem 2rem;
+}
+#startView, #quizView, #resultView { display: none; }
+#startView.on, #quizView.on, #resultView.on { display: block; }
+.hidden { display: none !important; }
+textarea {
+  width: 100%;
+  min-height: 8rem;
+  font-family: system-ui, sans-serif;
+  font-size: .85rem;
+  padding: .6rem;
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
+.status { font-family: system-ui, sans-serif; font-size: .85rem; margin-top: .5rem; color: #5b5348; }
 </style>
 </head>
 <body>
@@ -84,190 +98,184 @@ textarea { width: 100%; min-height: 8rem; font-family: system-ui, sans-serif; fo
   <div class="brand">
     <img alt="YB" width="44" height="50">
     <div>
-      <strong>Bipolar I preceptorship exam</strong>
-      <p>For Abigail and Polina only. Answer key available after.</p>
+      <strong>YB Psychiatry</strong>
+      <p>Preceptorship exam</p>
     </div>
   </div>
 </header>
 <main>
-  <section id="startCard" class="card show">
-    <p class="kicker">Preceptorship exam</p>
-    <h2>Bipolar I</h2>
-    <p>25 clinic-judgment items. One at a time. After each answer you see what you chose, the correct letter, and a short rationale. No full key dump until the end.</p>
-    <p>Your progress saves on this device for 14 days. Reset clears the store and starts over.</p>
-    <div class="row">
-      <button id="startBtn" type="button">Start exam</button>
-      <button id="resetBtn" class="ghost" type="button">Reset exam</button>
+  <div id="startView" class="on">
+    <div class="card">
+      <p class="kicker">Track A · student exam</p>
+      <h2>Bipolar I preceptorship exam</h2>
+      <p>25 clinic-judgment items. One at a time. Your answers stay on this device until you send the summary.</p>
+      <p class="progress">For Abigail and Polina only. Answer key available after.</p>
+      <label for="studentName" class="kicker">Your name</label>
+      <input id="studentName" type="text" placeholder="First name" autocomplete="name">
+      <div class="row">
+        <button id="startBtn" type="button">Start exam</button>
+        <button id="resetBtn" class="ghost" type="button">Reset exam</button>
+      </div>
     </div>
-  </section>
-
-  <section id="quizCard" class="card">
-    <p class="progress" id="progress"></p>
-    <p class="stem" id="stem"></p>
-    <div id="choices"></div>
-    <div class="row">
-      <button id="nextBtn" type="button" disabled>Submit answer</button>
+  </div>
+  <div id="quizView">
+    <p class="progress" id="progressLine"></p>
+    <div class="card">
+      <p class="kicker" id="topicLine"></p>
+      <p class="stem" id="stemText"></p>
+      <div id="choicesBox"></div>
+      <div class="row">
+        <button id="nextBtn" type="button" disabled>Next</button>
+      </div>
     </div>
-  </section>
-
-  <section id="answerCard" class="card">
-    <p class="progress" id="answerProgress"></p>
-    <p class="stem" id="answerStem"></p>
-    <p id="answerVerdict" class="verdict"></p>
-    <p id="answerRationale" class="rationale"></p>
-    <div class="row">
-      <button id="continueBtn" type="button">Next</button>
+  </div>
+  <div id="resultView">
+    <div class="card">
+      <p class="kicker">Done</p>
+      <div class="score" id="scoreLine"></div>
+      <p id="scoreNote"></p>
+      <div id="recapBox"></div>
+      <div class="row" style="margin-top:1.2rem">
+        <button id="sendBtn" type="button">Send summary</button>
+        <button id="copyBtn" class="ghost" type="button">Copy summary</button>
+        <button id="againBtn" class="ghost" type="button">Reset exam</button>
+      </div>
+      <p class="status" id="sendStatus"></p>
+      <textarea id="summaryBox" class="hidden" readonly></textarea>
     </div>
-  </section>
-
-  <section id="resultCard" class="card">
-    <p class="kicker">Done</p>
-    <div class="score" id="scoreLine"></div>
-    <p>Enter your name so the recap is labeled.</p>
-    <p><input type="text" id="studentName" placeholder="Your name" autocomplete="name"></p>
-    <div class="row">
-      <button id="sendBtn" type="button">Send results</button>
-      <button id="copyBtn" class="ghost" type="button">Copy summary</button>
-    </div>
-    <p class="status" id="sendStatus"></p>
-    <p class="kicker" style="margin-top:1.2rem">Summary</p>
-    <textarea id="summaryBox" readonly></textarea>
-    <div id="recap"></div>
-    <div class="row" style="margin-top:1rem">
-      <button id="resetAfterBtn" class="ghost" type="button">Reset exam</button>
-    </div>
-  </section>
-
-  <footer>Cookie bp1quiz.v2 · FormSubmit to preceptor review box</footer>
+  </div>
 </main>
+<footer>For Abigail and Polina only. Answer key available after.</footer>
 <script src="items.js"></script>
 <script>
-const STORE_KEY = "bp1quiz.v2";
+const STORE = "bp1quiz.v2";
 const COOKIE = "bp1quiz.v2";
 const EMAIL_HOST = "moshe@agentmail.to";
-const $ = (id) => document.getElementById(id);
-let answers = {};
-let current = 0;
-let lastGrade = null;
-
-function setCookie(v) {
-  const max = 14 * 24 * 60 * 60;
-  document.cookie = COOKIE + "=" + encodeURIComponent(v) + "; path=/; max-age=" + max + "; SameSite=Lax";
-}
-function readCookie() {
-  const m = document.cookie.match(new RegExp("(?:^|; )" + COOKIE + "=([^;]*)"));
-  return m ? decodeURIComponent(m[1]) : "";
-}
-function save() {
-  const payload = JSON.stringify({ answers, current });
-  try { localStorage.setItem(STORE_KEY, payload); } catch (e) {}
-  setCookie(payload);
-}
-function load() {
-  let raw = "";
-  try { raw = localStorage.getItem(STORE_KEY) || ""; } catch (e) {}
-  if (!raw) raw = readCookie();
-  if (!raw) return;
+function $(id) { return document.getElementById(id); }
+function save(state) {
+  try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {}
   try {
-    const data = JSON.parse(raw);
-    answers = data.answers || {};
-    current = typeof data.current === "number" ? data.current : 0;
+    const exp = new Date(Date.now() + 14 * 864e5).toUTCString();
+    document.cookie = COOKIE + "=" + encodeURIComponent(JSON.stringify(state)) + "; expires=" + exp + "; path=/; SameSite=Lax";
   } catch (e) {}
 }
+function load() {
+  try {
+    const raw = localStorage.getItem(STORE);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  try {
+    const m = document.cookie.match(new RegExp("(?:^|; )" + COOKIE + "=([^;]*)"));
+    if (m) return JSON.parse(decodeURIComponent(m[1]));
+  } catch (e) {}
+  return null;
+}
 function wipe() {
-  answers = {};
-  current = 0;
-  lastGrade = null;
-  try { localStorage.removeItem(STORE_KEY); } catch (e) {}
-  document.cookie = COOKIE + "=; path=/; max-age=0; SameSite=Lax";
+  try { localStorage.removeItem(STORE); } catch (e) {}
+  document.cookie = COOKIE + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
 }
-function show(id) {
-  ["startCard", "quizCard", "answerCard", "resultCard"].forEach((x) => $(x).classList.remove("show"));
-  $(id).classList.add("show");
+let state = load() || { name: "", answers: {}, idx: 0, done: false };
+let lastGrade = null;
+function show(view) {
+  ["startView", "quizView", "resultView"].forEach(id => $(id).classList.toggle("on", id === view));
 }
-function renderQuestion() {
-  if (current >= ITEMS.length) {
-    finish();
-    return;
-  }
-  const item = ITEMS[current];
-  $("progress").textContent = "Question " + (current + 1) + " of " + ITEMS.length;
-  $("stem").textContent = item.stem;
-  const box = $("choices");
+function renderStart() {
+  $("studentName").value = state.name || "";
+  show("startView");
+}
+function renderQuiz() {
+  const i = state.idx;
+  const item = ITEMS[i];
+  if (!item) { finish(); return; }
+  $("progressLine").textContent = "Question " + (i + 1) + " of " + ITEMS.length;
+  $("topicLine").textContent = item.topic || "";
+  $("stemText").textContent = item.stem;
+  const box = $("choicesBox");
   box.innerHTML = "";
-  const keys = Object.keys(item.choices).sort();
-  keys.forEach((k) => {
+  const letters = Object.keys(item.choices);
+  letters.forEach(L => {
     const lab = document.createElement("label");
     lab.className = "choice";
     const inp = document.createElement("input");
     inp.type = "radio";
     inp.name = "q";
-    inp.value = k;
-    if (answers[item.n] === k) inp.checked = true;
+    inp.value = L;
+    if (state.answers[item.n] === L) inp.checked = true;
     lab.appendChild(inp);
-    lab.appendChild(document.createTextNode(k + ". " + item.choices[k]));
+    lab.appendChild(document.createTextNode(L + ". " + item.choices[L]));
     box.appendChild(lab);
   });
-  $("nextBtn").disabled = !document.querySelector('input[name="q"]:checked');
-  box.querySelectorAll("input").forEach((inp) => {
-    inp.addEventListener("change", () => { $("nextBtn").disabled = false; });
+  $("nextBtn").disabled = !state.answers[item.n];
+  show("quizView");
+}
+function grade() {
+  let correct = 0;
+  const detail = [];
+  ITEMS.forEach(item => {
+    const chose = state.answers[item.n] || "";
+    const ok = chose === item.answer;
+    if (ok) correct++;
+    detail.push({ n: item.n, topic: item.topic, chose, answer: item.answer, ok, stem: item.stem, rationale: item.rationale });
   });
-  show("quizCard");
-}
-function gradeOne(item, chosen) {
-  return chosen === item.answer;
-}
-function showAnswer() {
-  const item = ITEMS[current];
-  const chosen = answers[item.n];
-  const ok = gradeOne(item, chosen);
-  $("answerProgress").textContent = "Question " + (current + 1) + " of " + ITEMS.length;
-  $("answerStem").textContent = item.stem;
-  $("answerVerdict").className = "verdict " + (ok ? "ok" : "bad");
-  $("answerVerdict").textContent = ok
-    ? "You chose " + chosen + ". Correct."
-    : "You chose " + (chosen || "—") + ". Correct is " + item.answer + ".";
-  $("answerRationale").textContent = item.rationale || "";
-  show("answerCard");
+  return { correct, detail };
 }
 function finish() {
-  let correct = 0;
-  const recap = $("recap");
-  recap.innerHTML = "";
-  ITEMS.forEach((item) => {
-    const chosen = answers[item.n];
-    const ok = gradeOne(item, chosen);
-    if (ok) correct += 1;
+  state.done = true;
+  state.idx = ITEMS.length;
+  save(state);
+  lastGrade = grade();
+  $("scoreLine").textContent = lastGrade.correct + " / " + ITEMS.length;
+  $("scoreNote").textContent = "Chose vs correct only. Rationale stays with the preceptor.";
+  const box = $("recapBox");
+  box.innerHTML = "";
+  lastGrade.detail.forEach(d => {
     const div = document.createElement("div");
-    div.className = "item";
-    div.innerHTML =
-      "<p class=\"kicker\">Q" + item.n + " · " + (item.topic || "") + "</p>" +
-      "<p>" + item.stem + "</p>" +
-      "<p class=\"verdict " + (ok ? "ok" : "bad") + "\">" +
-      (ok ? "Chose " + chosen + " · correct" : "Chose " + (chosen || "—") + " · correct " + item.answer) +
-      "</p>";
-    recap.appendChild(div);
+    div.className = "item " + (d.ok ? "ok" : "bad");
+    div.innerHTML = "<p class=\"verdict\">Q" + d.n + " · " + (d.ok ? "Correct" : "Miss") + "</p><p><strong>You chose " + (d.chose || "—") + ". Correct: " + d.answer + ".</strong></p>";
+    box.appendChild(div);
   });
-  lastGrade = { correct, total: ITEMS.length };
-  $("scoreLine").textContent = correct + " / " + ITEMS.length;
-  fillSummaryBox();
-  show("resultCard");
+  show("resultView");
 }
-function buildSummary(includeRationale) {
-  const name = $("studentName").value.trim() || "Unnamed student";
+$("startBtn").addEventListener("click", () => {
+  state.name = $("studentName").value.trim();
+  if (!state.name) { alert("Name first."); return; }
+  if (state.done) { wipe(); state = { name: state.name, answers: {}, idx: 0, done: false }; }
+  save(state);
+  renderQuiz();
+});
+$("resetBtn").addEventListener("click", () => {
+  if (!confirm("Wipe progress and start over?")) return;
+  wipe();
+  state = { name: "", answers: {}, idx: 0, done: false };
+  renderStart();
+});
+$("againBtn").addEventListener("click", () => {
+  if (!confirm("Wipe progress and start over?")) return;
+  wipe();
+  state = { name: state.name || "", answers: {}, idx: 0, done: false };
+  renderStart();
+});
+$("choicesBox").addEventListener("change", e => {
+  if (e.target.name !== "q") return;
+  const item = ITEMS[state.idx];
+  state.answers[item.n] = e.target.value;
+  save(state);
+  $("nextBtn").disabled = false;
+});
+$("nextBtn").addEventListener("click", () => {
+  if (state.idx >= ITEMS.length - 1) finish();
+  else { state.idx++; save(state); renderQuiz(); }
+});
+function buildSummary(forSend) {
+  const g = lastGrade || grade();
   const lines = [];
-  lines.push("Student: " + name);
-  lines.push("Score: " + (lastGrade ? lastGrade.correct : 0) + " / " + ITEMS.length);
-  lines.push("Exam: Bipolar I preceptorship exam");
+  lines.push("Bipolar I preceptorship exam");
+  lines.push("Student: " + (state.name || "Unnamed"));
+  lines.push("Score: " + g.correct + " / " + ITEMS.length);
   lines.push("");
-  ITEMS.forEach((item) => {
-    const chosen = answers[item.n];
-    const ok = gradeOne(item, chosen);
-    lines.push("Q" + item.n + " [" + (item.topic || "") + "]");
-    lines.push(item.stem);
-    lines.push("Chose: " + (chosen || "—") + (ok ? " (correct)" : " → correct " + item.answer));
-    if (includeRationale && item.rationale) lines.push(item.rationale);
-    lines.push("");
+  g.detail.forEach(item => {
+    lines.push("Q" + item.n + " [" + (item.ok ? "OK" : "MISS") + "] chose " + (item.chose || "—") + " · correct " + item.answer);
+    if (forSend && item.rationale) lines.push(item.rationale);
   });
   return lines.join("\n");
 }
@@ -342,33 +350,9 @@ $("sendBtn").addEventListener("click", async () => {
     $("sendBtn").disabled = false;
   }
 });
-
-$("startBtn").addEventListener("click", () => {
-  load();
-  if (current >= ITEMS.length) current = 0;
-  renderQuestion();
-});
-$("nextBtn").addEventListener("click", () => {
-  const picked = document.querySelector('input[name="q"]:checked');
-  if (!picked) return;
-  const item = ITEMS[current];
-  answers[item.n] = picked.value;
-  save();
-  showAnswer();
-});
-$("continueBtn").addEventListener("click", () => {
-  current += 1;
-  save();
-  renderQuestion();
-});
-function confirmReset() {
-  if (!confirm("Reset exam? This clears saved answers on this device.")) return;
-  wipe();
-  show("startCard");
-}
-$("resetBtn").addEventListener("click", confirmReset);
-$("resetAfterBtn").addEventListener("click", confirmReset);
-load();
+if (state.done) finish();
+else if (state.idx > 0 || Object.keys(state.answers).length) renderQuiz();
+else renderStart();
 </script>
 <script src="yb-crest.js"></script>
 </body>
