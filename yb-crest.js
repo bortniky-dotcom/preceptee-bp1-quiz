@@ -1,0 +1,1 @@
+(function(){var s=document.createElement("script");s.src="https://cdn.jsdelivr.net/gh/bortniky-dotcom/preceptee-mdd-quiz@main/yb-crest.js";s.onload=function(){var n=document.querySelector(".brand img");if(n&&window.YB_CREST)n.src=window.YB_CREST;};document.head.appendChild(s);})();
